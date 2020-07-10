@@ -26,7 +26,7 @@ job("Groovy 2")
 description ("This is my second job for Groovy project ")
 steps{
 shell('''sudo kubectl version
-if sudo ls /t6 | grep apache
+if sudo ls /t6 | grep html
 then
  if sudo kubectl get svc | grep apache-svc
  then
