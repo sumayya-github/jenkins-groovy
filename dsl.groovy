@@ -24,6 +24,8 @@ cat <<EOF |sudo kubectl apply -f -
 kind: Service
 metadata:
   name: php-svc
+  labels:
+    app: php
 spec:
   type: NodePort
   selector:
@@ -57,6 +59,8 @@ spec:
   selector:
     matchLabels:
       app: php
+  strategy:
+     type: Recreate
   template:
     metadata:
       name: php
@@ -80,6 +84,8 @@ apiVersion: v1
 kind: Service
 metadata:
   name: apache-svc
+  labels:
+    app: apache
 spec:
   type: NodePort
   selector:
@@ -113,6 +119,8 @@ spec:
   selector:
     matchLabels:
       app: apache
+  strategy:
+    type: Recreate
   template:
     metadata:
       name: apache
@@ -124,13 +132,13 @@ spec:
         image: httpd
         volumeMounts:
           - name: apache-vol
-            mountPath: /usr/local/apache2/htdocs/
+            mountPath: /var/www/html
       volumes:
       - name: apache-vol
         persistentVolumeClaim:
           claimName: apache-pv-claim
 EOF
-fi""")
+fi""") 
 	}
 }
 
