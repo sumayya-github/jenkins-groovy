@@ -17,70 +17,10 @@ job("Groovy 1") {
 	}
 	concurrentBuild(false)
 	steps {
-		shell("""if ls | grep php
+		shell("""if ls | grep html
 then
 cat <<EOF |sudo kubectl apply -f -
  apiVersion: v1
-kind: Service
-metadata:
-  name: php-svc
-  labels:
-    app: php
-spec:
-  type: NodePort
-  selector:
-    app: php
-  ports: 
-    - port: 80
-      targetPort: 80
-      nodePort: 30007
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: php-pv-claim
-  labels:
-    app: php
-spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 10Gi
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: php-pod
-  labels:
-    app: php
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: php
-  strategy:
-     type: Recreate
-  template:
-    metadata:
-      name: php
-      labels:
-        app: php
-    spec:
-      containers:
-      - name: php-con
-        image: httpd
-        volumeMounts:
-          - name: php-vol
-            mountPath: /var/www/html
-      volumes:
-      - name: php-vol
-        persistentVolumeClaim:
-          claimName:  php-pv-claim
-EOF
-else
-cat <<EOF |sudo kubectl apply -f -
-apiVersion: v1
 kind: Service
 metadata:
   name: apache-svc
@@ -90,7 +30,7 @@ spec:
   type: NodePort
   selector:
     app: apache
-  ports:
+  ports: 
     - port: 80
       targetPort: 80
       nodePort: 30007
@@ -106,7 +46,7 @@ spec:
   - ReadWriteOnce
   resources:
     requests:
-     storage: 10Gi
+      storage: 10Gi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -120,7 +60,7 @@ spec:
     matchLabels:
       app: apache
   strategy:
-    type: Recreate
+     type: Recreate
   template:
     metadata:
       name: apache
@@ -137,6 +77,66 @@ spec:
       - name: apache-vol
         persistentVolumeClaim:
           claimName: apache-pv-claim
+EOF
+else
+cat <<EOF |sudo kubectl apply -f -
+apiVersion: v1
+kind: Service
+metadata:
+  name: php-svc
+  labels:
+    app: php
+spec:
+  type: NodePort
+  selector:
+    app: php
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30007
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: php-pv-claim
+  labels:
+    app: php
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+     storage: 10Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: php-pod
+  labels:
+    app: php
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: php
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      name: php
+      labels:
+        app: php
+    spec:
+      containers:
+      - name: php-con
+        image: httpd
+        volumeMounts:
+          - name: php-vol
+            mountPath: /var/www/html
+      volumes:
+      - name: php-vol
+        persistentVolumeClaim:
+          claimName: php-pv-claim
 EOF
 fi""") 
 	}
