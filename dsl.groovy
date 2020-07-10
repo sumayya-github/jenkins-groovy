@@ -19,7 +19,7 @@ job("Groovy 1") {
 	steps {
 		shell("""if ls | grep php
 then
-cat <<EOF | kubectl apply -f -
+cat <<EOF |sudo kubectl apply -f -
  apiVersion: v1
 kind: Service
 metadata:
@@ -75,7 +75,7 @@ spec:
           claimName:  php-pv-claim
 EOF
 else
-cat <<EOF | kubectl apply -f -
+cat <<EOF |sudo kubectl apply -f -
 apiVersion: v1
 kind: Service
 metadata:
