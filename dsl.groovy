@@ -17,138 +17,49 @@ job("Groovy 1") {
 	}
 	concurrentBuild(false)
 	steps {
-		shell("""if ls | grep html
-then
-cat <<EOF |sudo kubectl apply -f -
-apiVersion: v1
-kind: Service
-metadata:
-  name: apache-svc
-  labels:
-    app: apache
-spec:
-  type: NodePort
-  selector:
-    app: apache
-  ports: 
-    - port: 80
-      targetPort: 80
-      nodePort: 30007
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: apache-pvc
-  labels:
-    app: apache
-spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 10Gi
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: apache
-  labels:
-    app: apache
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: apache
-  strategy:
-     type: Recreate
-  template:
-    metadata:
-      name: apache
-      labels:
-        app: apache
-    spec:
-      containers:
-      - name: apache-con
-        image: httpd
-        volumeMounts:
-        - name: apache-vol
-          mountPath: /var/www/html
-      volumes:
-      - name: apache-vol
-        persistentVolumeClaim:
-          claimName: apache-pvc
-EOF
-else
-cat <<EOF |sudo kubectl apply -f -
-apiVersion: v1
-kind: Service
-metadata:
-  name: php-svc
-  labels:
-    app: php
-spec:
-  type: NodePort
-  selector:
-    app: php
-  ports:
-    - port: 80
-      targetPort: 80
-      nodePort: 30007
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: php-pv-claim
-  labels:
-    app: php
-spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-     storage: 10Gi
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: php-pod
-  labels:
-    app: php
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: php
-  strategy:
-    type: Recreate
-  template:
-    metadata:
-      name: php
-      labels:
-        app: php
-    spec:
-      containers:
-      - name: php-con
-        image: httpd
-        volumeMounts:
-        - name: php-vol
-          mountPath: /var/www/html
-      volumes:
-      - name: php-vol
-        persistentVolumeClaim:
-          claimName: php-pv-claim
-EOF
-fi""") 
+		shell('sudo cp -r -v -f * /t6')
 	}
 }
 
-job("Groovy 2") {
-	description("This is the second job of groovy project")
+job("Groovy 2")
+{
+description ("This is my second job for Groovy project ")
+steps{
+shell('''sudo kubectl version
+if sudo ls /t6 | grep apache
+then
+ if sudo kubectl get svc | grep apache-svc
+ then
+ echo "Service for apache is Running"
+ else
+ sudo kubectl create -f /t6/apache_svc.yml 
+ fi
+ if sudo kubectl get pvc | grep apache-pvc
+ then
+ echo " PVC for apache is already running"
+ else
+ sudo kubectl create -f /t6/apache_pvc.yml 
+ fi
+ if sudo kubectl get deploy | grep apache_deploy
+ then
+ echo "Deployment for apache running"
+ else
+ sudo  kubectl create -f /t6/apache_deploy.yml
+else 
+echo "no html code from developer to host"
+fi
+}
+triggers {
+   upstream('Groovy 1', 'SUCCESS')
+     }
+  }
+job("Groovy 3") {
+	description("This is the third job of groovy project")
 	
 	triggers {
 	        
 	        upstream {
-	            upstreamProjects('Groovy 1')
+	            upstreamProjects('Groovy 2')
 	            threshold('SUCCESS')
 	        }
 	    }
@@ -161,10 +72,20 @@ else
 exit 1
 fi""")
 	}
-	publishers {
+	
+job("Groovy 4")
+{
+description ("This is mailing job")
+ authenticationToken('mail')
+   publishers {
 		mailer("sumayyakhatoon58@gmail.com", false, false)
 	}
-}
+   triggers {
+   upstream('Groovy 3', 'SUCCESS')
+   }
+   }
+   
+   
 buildPipelineView('Groovy Project') {
     filterBuildQueue()
     filterExecutors()
