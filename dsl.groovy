@@ -84,8 +84,6 @@ description ("This is mailing job")
    upstream('Groovy 3', 'SUCCESS')
    }
    }
-   
-   
 buildPipelineView('Groovy Project') {
     filterBuildQueue()
     filterExecutors()
@@ -95,4 +93,4 @@ buildPipelineView('Groovy Project') {
     alwaysAllowManualTrigger()
     showPipelineParameters()
     refreshFrequency(60)
-}
+    }
