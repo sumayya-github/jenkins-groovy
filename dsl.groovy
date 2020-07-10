@@ -51,7 +51,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: apache-pod
+  name: apache
   labels:
     app: apache
 spec:
@@ -71,8 +71,8 @@ spec:
       - name: apache-con
         image: httpd
         volumeMounts:
-          - name: apache-vol
-            mountPath: /var/www/html
+        - name: apache-vol
+          mountPath: /var/www/html
       volumes:
       - name: apache-vol
         persistentVolumeClaim:
@@ -131,8 +131,8 @@ spec:
       - name: php-con
         image: httpd
         volumeMounts:
-          - name: php-vol
-            mountPath: /var/www/html
+        - name: php-vol
+          mountPath: /var/www/html
       volumes:
       - name: php-vol
         persistentVolumeClaim:
