@@ -38,7 +38,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: apache-pv-claim
+  name: apache-pvc
   labels:
     app: apache
 spec:
@@ -76,7 +76,7 @@ spec:
       volumes:
       - name: apache-vol
         persistentVolumeClaim:
-          claimName:  apache-pv-claim
+          claimName: apache-pvc
 EOF
 else
 cat <<EOF |sudo kubectl apply -f -
