@@ -76,7 +76,7 @@ spec:
       volumes:
       - name: apache-vol
         persistentVolumeClaim:
-          claimName: apache-pv-claim
+          claimName:  apache-pv-claim
 EOF
 else
 cat <<EOF |sudo kubectl apply -f -
