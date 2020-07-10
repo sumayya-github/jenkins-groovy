@@ -131,6 +131,8 @@ spec:
           claimName: apache-pv-claim
 EOF
 fi""")
+		
+sudo kubectl get all
 	}
 }
 
