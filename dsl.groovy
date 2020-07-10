@@ -20,7 +20,7 @@ job("Groovy 1") {
 		shell("""if ls | grep html
 then
 cat <<EOF |sudo kubectl apply -f -
- apiVersion: v1
+apiVersion: v1
 kind: Service
 metadata:
   name: apache-svc
