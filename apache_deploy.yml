@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apache
+  labels: 
+    app: apache
+spec:
+  selector:
+   matchLabels:
+     app: apache
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: apache
+    spec:
+      containers:
+      - image: "vimal13/apache-webserver-php"
+        name: "apache"
+        ports:
+         - containerPort: 30007
+           name: apache
+        volumeMounts:
+        - name: apache-vol
+          mountPath: /var/www/html
+      volumes:
+      - name: apache-vol
+        persistentVolumeClaim:
+          claimName: apache-pvc
